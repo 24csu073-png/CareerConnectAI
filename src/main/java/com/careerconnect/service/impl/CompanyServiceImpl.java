@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.careerconnect.exception.ResourceNotFoundException;
 import com.careerconnect.model.Company;
 import com.careerconnect.repository.CompanyRepository;
 import com.careerconnect.service.CompanyService;
@@ -22,7 +23,9 @@ public class CompanyServiceImpl implements CompanyService {
 
     @Override
     public Company getCompanyById(Long id) {
-        return companyRepository.findById(id).orElse(null);
+        return companyRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Company not found with id " + id));
     }
 
     @Override
@@ -33,24 +36,26 @@ public class CompanyServiceImpl implements CompanyService {
     @Override
     public Company updateCompany(Long id, Company company) {
 
-        Company existing = companyRepository.findById(id).orElse(null);
+        Company existing = companyRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Company not found with id " + id));
 
-        if (existing != null) {
+        existing.setCompanyName(company.getCompanyName());
+        existing.setIndustry(company.getIndustry());
+        existing.setLocation(company.getLocation());
+        existing.setWebsite(company.getWebsite());
+        existing.setHrEmail(company.getHrEmail());
 
-            existing.setCompanyName(company.getCompanyName());
-            existing.setIndustry(company.getIndustry());
-            existing.setLocation(company.getLocation());
-            existing.setHrEmail(company.getHrEmail());
-            existing.setWebsite(company.getWebsite());
-
-            return companyRepository.save(existing);
-        }
-
-        return null;
+        return companyRepository.save(existing);
     }
 
     @Override
     public void deleteCompany(Long id) {
+
+        companyRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Company not found with id " + id));
+
         companyRepository.deleteById(id);
     }
 }

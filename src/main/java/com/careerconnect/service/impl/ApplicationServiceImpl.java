@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.careerconnect.exception.ResourceNotFoundException;
 import com.careerconnect.model.Application;
 import com.careerconnect.repository.ApplicationRepository;
 import com.careerconnect.service.ApplicationService;
@@ -22,8 +23,11 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     @Override
     public Application getApplicationById(Long id) {
-        return applicationRepository.findById(id).orElse(null);
+        return applicationRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Application not found with id " + id));
     }
+
     @Override
     public List<Application> getAllApplications() {
         return applicationRepository.findAll();
@@ -32,22 +36,25 @@ public class ApplicationServiceImpl implements ApplicationService {
     @Override
     public Application updateApplication(Long id, Application application) {
 
-    	Application existing = applicationRepository.findById(id).orElse(null);
-        if (existing != null) {
+        Application existing = applicationRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Application not found with id " + id));
 
-            existing.setStudentId(application.getStudentId());
-            existing.setCompanyId(application.getCompanyId());
-            existing.setJobRole(application.getJobRole());
-            existing.setStatus(application.getStatus());
+        existing.setStudentId(application.getStudentId());
+        existing.setCompanyId(application.getCompanyId());
+        existing.setJobRole(application.getJobRole());
+        existing.setStatus(application.getStatus());
 
-            return applicationRepository.save(existing);
-        }
-
-        return null;
+        return applicationRepository.save(existing);
     }
 
     @Override
     public void deleteApplication(Long id) {
+
+        applicationRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Application not found with id " + id));
+
         applicationRepository.deleteById(id);
     }
 }

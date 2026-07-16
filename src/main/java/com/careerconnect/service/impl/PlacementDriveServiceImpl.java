@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.careerconnect.exception.ResourceNotFoundException;
 import com.careerconnect.model.PlacementDrive;
 import com.careerconnect.repository.PlacementDriveRepository;
 import com.careerconnect.service.PlacementDriveService;
@@ -22,7 +23,9 @@ public class PlacementDriveServiceImpl implements PlacementDriveService {
 
     @Override
     public PlacementDrive getPlacementDriveById(Long id) {
-        return placementDriveRepository.findById(id).orElse(null);
+        return placementDriveRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Placement Drive not found with id " + id));
     }
 
     @Override
@@ -33,25 +36,27 @@ public class PlacementDriveServiceImpl implements PlacementDriveService {
     @Override
     public PlacementDrive updatePlacementDrive(Long id, PlacementDrive drive) {
 
-        PlacementDrive existing = placementDriveRepository.findById(id).orElse(null);
+        PlacementDrive existing = placementDriveRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Placement Drive not found with id " + id));
 
-        if (existing != null) {
+        existing.setTitle(drive.getTitle());
+        existing.setCompanyName(drive.getCompanyName());
+        existing.setLocation(drive.getLocation());
+        existing.setDriveDate(drive.getDriveDate());
+        existing.setMinimumCgpa(drive.getMinimumCgpa());
+        existing.setJobRole(drive.getJobRole());
 
-            existing.setTitle(drive.getTitle());
-            existing.setCompanyName(drive.getCompanyName());
-            existing.setLocation(drive.getLocation());
-            existing.setDriveDate(drive.getDriveDate());
-            existing.setMinimumCgpa(drive.getMinimumCgpa());
-            existing.setJobRole(drive.getJobRole());
-
-            return placementDriveRepository.save(existing);
-        }
-
-        return null;
+        return placementDriveRepository.save(existing);
     }
 
     @Override
     public void deletePlacementDrive(Long id) {
+
+        placementDriveRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Placement Drive not found with id " + id));
+
         placementDriveRepository.deleteById(id);
     }
 }

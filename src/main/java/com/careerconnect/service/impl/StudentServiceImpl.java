@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.careerconnect.exception.ResourceNotFoundException;
 import com.careerconnect.model.Student;
 import com.careerconnect.repository.StudentRepository;
 import com.careerconnect.service.StudentService;
@@ -22,7 +23,9 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public Student getStudentById(Long id) {
-        return studentRepository.findById(id).orElse(null);
+        return studentRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Student not found with id " + id));
     }
 
     @Override
@@ -33,24 +36,27 @@ public class StudentServiceImpl implements StudentService {
     @Override
     public Student updateStudent(Long id, Student student) {
 
-        Student existingStudent = studentRepository.findById(id).orElse(null);
+        Student existing = studentRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Student not found with id " + id));
 
-        if (existingStudent != null) {
-            existingStudent.setName(student.getName());
-            existingStudent.setEmail(student.getEmail());
-            existingStudent.setCgpa(student.getCgpa());
-            existingStudent.setSkills(student.getSkills());
-            existingStudent.setGraduationYear(student.getGraduationYear());
-            existingStudent.setBacklogs(student.getBacklogs());
+        existing.setName(student.getName());
+        existing.setEmail(student.getEmail());
+        existing.setCgpa(student.getCgpa());
+        existing.setBacklogs(student.getBacklogs());
+        existing.setGraduationYear(student.getGraduationYear());
+        existing.setSkills(student.getSkills());
 
-            return studentRepository.save(existingStudent);
-        }
-
-        return null;
+        return studentRepository.save(existing);
     }
 
     @Override
     public void deleteStudent(Long id) {
+
+        studentRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Student not found with id " + id));
+
         studentRepository.deleteById(id);
     }
 }
