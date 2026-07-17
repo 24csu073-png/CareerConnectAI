@@ -643,4 +643,7 @@ GitHub: \*\*https://github.com/Harshyyuu\*\*
 
 
 This project is developed for educational purposes as part of a Spring Boot backend development project.
+## Test Image
+
+![Test](./screenshots/01_Swagger_UI.png)
 
